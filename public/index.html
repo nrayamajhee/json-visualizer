@@ -1,23 +1,112 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="generator" content="GitLab Pages">
-    <title>Plain HTML site using GitLab Pages</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <div class="navbar">
-      <a href="https://pages.gitlab.io/plain-html/">Plain HTML Example</a>
-      <a href="https://gitlab.com/pages/plain-html/">Repository</a>
-      <a href="https://gitlab.com/pages/">Other Examples</a>
-    </div>
+<html lang="en">
 
-    <h1>Hello World!</h1>
+<head>
+    <meta charset="UTF-8">
+    <title>Simple JSON Visualizer</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
 
-    <p>
-      This is a simple plain-HTML website on GitLab Pages, without any fancy static site generator.
-    </p>
-  </body>
+<body>
+    <wrapper>
+
+        <h1>Simple JSON Visualizer</h1>
+        <deck>
+            <textarea autocomplete="off" id="code">
+// Your javascript goes here
+// Note: The code written here is evaluated as is, so technically you could break the app.
+// Use with caution!
+// The functions exposed are: readJsonFile, readJsonUrl, and the Applciation object as 'app'
+// Click the play button on the right to run this code.
+
+readJsonUrl('file:///home/nishan/Documents/Projects/dr-phai-research/data/sample_data_1.txt')
+    .then((data) => {
+        app.setData(data);
+        app.log(JSON.stringify(data, undefined, 2));
+        app.log('Reading json file and displaying it here:');
+    }).catch((err) => app.log(err));
+        </textarea>
+            <button id="run"><i class="material-icons">play_arrow</i></button>
+            <panel>
+                <scroll-wrap>
+                    <scroll id="slider">
+                        <tabs>
+                            <tab>
+                                <scroll-wrap>
+                                    <scroll id="console">
+                                        <pre></pre>
+                                    </scroll>
+                                </scroll-wrap>
+                            </tab>
+                            <tab>
+                                <scroll-wrap>
+                                    <scroll>
+                                        <table>
+                                        </table>
+                                    </scroll>
+                                </scroll-wrap>
+                            </tab>
+                        </tabs>
+                    </scroll>
+                </scroll-wrap>
+            </panel>
+            <button-group>
+                <input type="file" id="file">
+                <label for="file">
+                    <i class="material-icons">
+                        cloud_upload
+                    </i>
+                </label>
+                <button id="visualize">
+                    <i class="material-icons">
+                        list_alt
+                    </i>
+                </button>
+                <button id="text-wrap">
+                    <i class="material-icons">
+                        wrap_text
+                    </i>
+                </button>
+            </button-group>
+        </deck>
+        <p>A <a href="https://www.gnu.org/philosophy/free-sw.html">free</a> software by <a
+                href="https://nishan.rayamajhee.com"> nishan.rayamajhee</a> <a
+                href="https://gitlab.com/nrayamajhee/json-viewer">available</a> under <a
+                href="https://www.apache.org/licenses/LICENSE-2.0.html">Apache</a> or <a
+                href="https://opensource.org/licenses/MIT">MIT</a> license.</p>
+        <script src="js/shell.js"></script>
+        <script>
+            (function main() {
+                const app = new Application('scroll pre', 'table', false);
+                let data;
+                document.getElementById("run").addEventListener('click', () => {
+                    app.slider.scrollLeft = 0;
+                    const code = document.getElementById("code").value;
+                    eval(code);
+                })
+                document.getElementById("visualize").addEventListener('click', (e) => {
+                    app.switchDisplay();
+                    app.renderTable();
+                });
+                document.getElementById("file").addEventListener('change', (e) => {
+                    app.slider.scrollLeft = 0;
+                    readJsonFile(e.target.files)
+                        .then((d) => {
+                            app.clear();
+                            app.setData(d);
+                            app.log(JSON.stringify(d, undefined, 2));
+                            app.log(`Loaded file!`)
+                        }).catch((err) => app.log(err));
+                })
+                document.getElementById("text-wrap").addEventListener('click', (e) => {
+                    app.toggleWrap();
+                });
+                document.getElementById("run").click();
+            })();
+        </script>
+    </wrapper>
+</body>
+
 </html>
-
