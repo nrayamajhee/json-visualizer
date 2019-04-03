@@ -32,7 +32,7 @@ class Application {
     setData(json) {
         this.data = json;
     }
-    loadJson(file) {
+    loadJson(file, renderOptions) {
         this.allowRender = true;
         this.notify('Loading file');
         this.slider.scrollLeft = 0;
@@ -42,7 +42,13 @@ class Application {
             app.notify('Reading json file...');
             this.log(JSON.stringify(d, undefined, 2));
             app.notify('Creating Table...');
-            this.renderTable();
+            if (renderOptions == null) {
+                document.querySelector('legend').classList.remove('shown');
+                this.renderTable(null, null);
+            } else {
+                document.querySelector('legend').classList.add('shown');
+                this.renderTable(renderOptions.redIndex, renderOptions.urlIndexes);
+            }
             app.notify('Table Created...');
         };
         let afterError = (err) => {
@@ -50,14 +56,12 @@ class Application {
             this.log(err);
         }
         if (file instanceof File) {
-            console.log("file");
             console.log(file);
             readJsonFile(file)
                 .then((d) => {
                     after(d);
                 }).catch((err) => afterError(err));
         } else {
-            console.log("url");
             readJsonUrl(file)
                 .then((d) => {
                     after(d);
@@ -76,7 +80,7 @@ class Application {
             }, 400);
         }, this.timeout);
     }
-    renderTable() {
+    renderTable(redIndex, urlIndexes) {
         if (this.data == undefined) return;
         if (!this.allowRender) return;
         this.notify('Building Table...');
@@ -85,21 +89,23 @@ class Application {
         let tbody = document.createElement('tbody');
         const regex = /^(\w+:\/\/)(www\.|)(.*)/gm;
         const subst = '$3';
-        let redIndx = 4;
-        let urlIndx = 5;
-        let homeUrl = 7;
         for (let i = 0; i < this.data.length; i++) {
             if (i == 0) {
                 const keys = Object.keys(this.data[0]);
                 let heads = '<tr>'
                 for (let j = 0; j < keys.length; j++) {
-                    if (j == redIndx) {
-                        heads += `<th class="redirect">${keys[j]}</th>`;
-                    } else if (j == urlIndx) {
-                        heads += `<th class="url">${keys[j]}</th>`;
-                    } else {
-                        heads += `<th>${keys[j]}</th>`;
-                    }
+                    let th = `<th>${keys[j]}</th>`;
+                    if (j == redIndex) {
+                        th = `<th class="redirect">${keys[j]}</th>`;
+                    } else if (urlIndexes != undefined) {
+                        for (let k = 0; k < urlIndexes.length; k++) {
+                            if (j == urlIndexes[k]) {
+                                console.log(j);
+                                th = `<th class="url">${keys[j]}</th>`;
+                            }
+                        }
+                    } 
+                    heads += th;
                 }
                 heads += '</tr>';
                 thead.innerHTML = heads;
@@ -108,7 +114,7 @@ class Application {
             const values = Object.values(this.data[i]);
             for (let j = 0; j < values.length; j++) {
                 let rowTxt = `<td>${values[j]}</td>`;
-                if (j == redIndx) {
+                if (j == redIndex) {
                     rowTxt = '<td class="redirect"><ul>';
                     for (let k = 0; k < values[j].length; k++) {
                         const url = values[j][k][0][2].toString().replace(regex, subst);
@@ -116,9 +122,13 @@ class Application {
                         rowTxt += `<li class="${type}">${url}</li>`;
                     }
                     rowTxt += '</ul></td>';
-                } else if (j == urlIndx || j == homeUrl) {
-                    const url = values[j].toString().replace(regex, '$3');
-                    rowTxt = `<td><div class="url">${url}</div></td>`;
+                } else if (urlIndexes != undefined) {
+                    for (let k = 0; k < urlIndexes.length; k++) {
+                        if (j == urlIndexes[k]) {
+                            const url = values[j].toString().replace(regex, '$3');
+                            rowTxt = `<td><div class="url">${url}</div></td>`;
+                        }
+                    }
                 }
                 row.insertAdjacentHTML('beforeend', rowTxt);
             }

@@ -120,7 +120,12 @@ td.redirect {
     margin-right: 0;
 }
 
+legend.shown{
+    display: block;
+}
+
 legend {
+    display: none;
     position: absolute;
     bottom: 0.7em;
     padding: calc(var(--gap) / 4);

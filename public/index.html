@@ -21,10 +21,10 @@
 // Your javascript goes here
 // Note: The code written here is evaluated as is, so technically you could break the app.
 // Use with caution!
-// The functions exposed are: readJsonFile, readJsonUrl, and the Applciation object as 'app'
+// The functions exposed are: readJsonFile, readJsonUrl, and the Application object as 'app'
 // Click the play button on the right to run this code.
 
-app.loadJson('https://nrayamajhee.gitlab.io/json-visualizer/data/sample_data_1.txt');
+app.loadJson('https://nrayamajhee.gitlab.io/json-visualizer/data/sample_data_1.txt', {redIndex:4,urlIndexes:[5,7]});
         </textarea>
                 </scroll-wrap>
             </console-in>
@@ -86,7 +86,7 @@ app.loadJson('https://nrayamajhee.gitlab.io/json-visualizer/data/sample_data_1.t
         </deck>
         <p>A <a href="https://www.gnu.org/philosophy/free-sw.html">free</a> software by <a
                 href="https://nishan.rayamajhee.com"> nishan.rayamajhee</a> <a
-                href="https://gitlab.com/nrayamajhee/json-viewer">available</a> under <a
+                href="https://gitlab.com/nrayamajhee/json-visualizer">available</a> under <a
                 href="https://www.apache.org/licenses/LICENSE-2.0.html">Apache</a> or <a
                 href="https://opensource.org/licenses/MIT">MIT</a> license.</p>
         <script src="js/shell.js"></script>
@@ -109,7 +109,7 @@ app.loadJson('https://nrayamajhee.gitlab.io/json-visualizer/data/sample_data_1.t
                     const scroll = this.slider.scrollLeft;
                 });
                 document.getElementById("file").addEventListener('change', (e) => {
-                    app.loadJson(e.target.files[0]);
+                    app.loadJson(e.target.files[0],{redIndex:4,urlIndexes:[5,7]});
                 })
                 document.getElementById("text-wrap").addEventListener('click', (e) => {
                     app.toggleWrap();
