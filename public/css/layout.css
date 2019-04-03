@@ -207,7 +207,7 @@ notify {
     top: 1em;
     left: 50%;
     transform: translate(-50%, 0);
-    width: 30em;
+    width: 20em;
     min-height: 3em;
     background-color: var(--bg-lighter);
     border-radius: var(--gap);

@@ -1,5 +1,5 @@
 class Application {
-    constructor(options){
+    constructor(options) {
         this.el = document.querySelector(options.console);
         this.elTable = document.querySelector(options.table);
         this.slider = document.getElementById('slider');
@@ -10,7 +10,7 @@ class Application {
         window.addEventListener('resize', () => {
             this.slider.scrollLeft = 0;
         });
-        this.timer = setTimeout(()=>{
+        this.timer = setTimeout(() => {
         }, this.timeout);
     }
     log(msg) {
@@ -32,14 +32,46 @@ class Application {
     setData(json) {
         this.data = json;
     }
+    loadJson(file) {
+        this.allowRender = true;
+        this.notify('Loading file');
+        this.slider.scrollLeft = 0;
+        let after = (d) => {
+            this.clear();
+            this.setData(d);
+            app.notify('Reading json file...');
+            this.log(JSON.stringify(d, undefined, 2));
+            app.notify('Creating Table...');
+            this.renderTable();
+            app.notify('Table Created...');
+        };
+        let afterError = (err) => {
+            this.notify(err);
+            this.log(err);
+        }
+        if (file instanceof File) {
+            console.log("file");
+            console.log(file);
+            readJsonFile(file)
+                .then((d) => {
+                    after(d);
+                }).catch((err) => afterError(err));
+        } else {
+            console.log("url");
+            readJsonUrl(file)
+                .then((d) => {
+                    after(d);
+                }).catch((err) => afterError(err));
+        }
+    }
     notify(message) {
         window.clearTimeout(this.timer);
         this.elNotify.innerHTML = `<p>${message}</p>`;
         this.elNotify.classList.add('shown');
         this.elNotify.classList.add('visible');
-        this.timer = setTimeout(()=>{
+        this.timer = setTimeout(() => {
             this.elNotify.classList.remove('visible');
-            setTimeout(()=>{
+            setTimeout(() => {
                 this.elNotify.classList.remove('shown');
             }, 400);
         }, this.timeout);
@@ -94,8 +126,8 @@ class Application {
         }
         this.elTable.insertAdjacentElement('beforeend', thead);
         this.elTable.insertAdjacentElement('beforeend', tbody);
-        document.querySelectorAll("td .url").forEach((el)=>el.addEventListener('click', (e) => { copyToClipboard(e.target.innerText); this.notify('Copied url to clipboard!')}));
-        document.querySelectorAll("td.redirect ul li").forEach((el)=>el.addEventListener('click', (e) => { copyToClipboard(e.target.innerText); this.notify('Copied url to clipboard!');}));
+        document.querySelectorAll("td .url").forEach((el) => el.addEventListener('click', (e) => { copyToClipboard(e.target.innerText); this.notify('Copied url to clipboard!') }));
+        document.querySelectorAll("td.redirect ul li").forEach((el) => el.addEventListener('click', (e) => { copyToClipboard(e.target.innerText); this.notify('Copied url to clipboard!'); }));
         this.allowRender = false;
         this.notify('Table has been built...');
     }
@@ -118,22 +150,22 @@ class Application {
 }
 function copyToClipboard(text) {
     console.log(text);
-    navigator.clipboard.writeText(text).then(()=>{
+    navigator.clipboard.writeText(text).then(() => {
         console.log('Async: Copying to clipboard was successful!');
-    }, (err)=>{
+    }, (err) => {
         console.error('Async: Could not copy text: ', err);
     });
 }
 // reads text returns json
 function readJsonFile(files) {
     return new Promise((resolve, reject) => {
-        if (files && files[0]) {
+        if (files) {
             const r = new FileReader();
             r.onload = (e) => {
                 const jsonData = JSON.parse(e.target.result);
                 return resolve(jsonData);
             }
-            r.readAsText(files[0]);
+            r.readAsText(files);
         } else {
             reject('Invalid File!');
         }

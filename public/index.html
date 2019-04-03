@@ -24,14 +24,7 @@
 // The functions exposed are: readJsonFile, readJsonUrl, and the Applciation object as 'app'
 // Click the play button on the right to run this code.
 
-readJsonUrl('file:///home/nishan/Documents/Projects/json-visualizer/public/data/sample_data_1.txt')
-    .then((data) => {
-        app.setData(data);
-        app.notify('Reading json file...');
-        app.log(JSON.stringify(data, undefined, 2));
-        app.notify('Displaying json file...');
-        app.renderTable();
-    }).catch((err) => app.log(err));
+app.loadJson('https://nrayamajhee.gitlab.io/json-visualizer/data/sample_data_1.txt');
         </textarea>
                 </scroll-wrap>
             </console-in>
@@ -98,13 +91,13 @@ readJsonUrl('file:///home/nishan/Documents/Projects/json-visualizer/public/data/
                 href="https://opensource.org/licenses/MIT">MIT</a> license.</p>
         <script src="js/shell.js"></script>
         <script>
+            const app = new Application({
+                console: 'scroll pre',
+                table: 'table',
+                notify: { el: 'notify', time: 1000 },
+                outputToConsole: false,
+            });
             (function main() {
-                const app = new Application({
-                    console: 'scroll pre',
-                    table: 'table',
-                    notify: { el: 'notify', time: 1000 },
-                    outputToConsole: false,
-                });
                 let data;
                 document.getElementById("run").addEventListener('click', () => {
                     app.slider.scrollLeft = 0;
@@ -116,17 +109,7 @@ readJsonUrl('file:///home/nishan/Documents/Projects/json-visualizer/public/data/
                     const scroll = this.slider.scrollLeft;
                 });
                 document.getElementById("file").addEventListener('change', (e) => {
-                    app.allowRender = true;
-                    app.notify('Loading file')
-                    app.slider.scrollLeft = 0;
-                    readJsonFile(e.target.files)
-                        .then((d) => {
-                            app.clear();
-                            app.setData(d);
-                            app.log(JSON.stringify(d, undefined, 2));
-                            app.notify('Loaded file!')
-                            app.renderTable();
-                        }).catch((err) => app.log(err));
+                    app.loadJson(e.target.files[0]);
                 })
                 document.getElementById("text-wrap").addEventListener('click', (e) => {
                     app.toggleWrap();
