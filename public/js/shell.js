@@ -1,12 +1,17 @@
 class Application {
-    constructor(elSelector, elTableSelector, outputToConsole) {
-        this.el = document.querySelector(elSelector);
-        this.elTable = document.querySelector(elTableSelector);
+    constructor(options){
+        this.el = document.querySelector(options.console);
+        this.elTable = document.querySelector(options.table);
         this.slider = document.getElementById('slider');
-        this.outputToConsole = outputToConsole;
+        this.outputToConsole = options.outputToConsole;
+        this.elNotify = document.querySelector(options.notify.el);
+        this.timeout = options.notify.time;
+        this.allowRender = true;
         window.addEventListener('resize', () => {
             this.slider.scrollLeft = 0;
         });
+        this.timer = setTimeout(()=>{
+        }, this.timeout);
     }
     log(msg) {
         if (this.outputToConsole) console.log(msg);
@@ -27,13 +32,30 @@ class Application {
     setData(json) {
         this.data = json;
     }
+    notify(message) {
+        window.clearTimeout(this.timer);
+        this.elNotify.innerHTML = `<p>${message}</p>`;
+        this.elNotify.classList.add('shown');
+        this.elNotify.classList.add('visible');
+        this.timer = setTimeout(()=>{
+            this.elNotify.classList.remove('visible');
+            setTimeout(()=>{
+                this.elNotify.classList.remove('shown');
+            }, 400);
+        }, this.timeout);
+    }
     renderTable() {
         if (this.data == undefined) return;
+        if (!this.allowRender) return;
+        this.notify('Building Table...');
         this.elTable.innerHTML = '';
         let thead = document.createElement('thead');
         let tbody = document.createElement('tbody');
+        const regex = /^(\w+:\/\/)(www\.|)(.*)/gm;
+        const subst = '$3';
         let redIndx = 4;
         let urlIndx = 5;
+        let homeUrl = 7;
         for (let i = 0; i < this.data.length; i++) {
             if (i == 0) {
                 const keys = Object.keys(this.data[0]);
@@ -57,14 +79,14 @@ class Application {
                 if (j == redIndx) {
                     rowTxt = '<td class="redirect"><ul>';
                     for (let k = 0; k < values[j].length; k++) {
-                        const url = values[j][k][0][2];
+                        const url = values[j][k][0][2].toString().replace(regex, subst);
                         const type = values[j][k][1].replace(/\s+/g, '-').toLowerCase();
-                        // console.log(type);
                         rowTxt += `<li class="${type}">${url}</li>`;
                     }
                     rowTxt += '</ul></td>';
-                } else if (j == urlIndx) {
-                    rowTxt = `<td><div class="url">${values[j]}</div></td>`;
+                } else if (j == urlIndx || j == homeUrl) {
+                    const url = values[j].toString().replace(regex, '$3');
+                    rowTxt = `<td><div class="url">${url}</div></td>`;
                 }
                 row.insertAdjacentHTML('beforeend', rowTxt);
             }
@@ -72,8 +94,10 @@ class Application {
         }
         this.elTable.insertAdjacentElement('beforeend', thead);
         this.elTable.insertAdjacentElement('beforeend', tbody);
-        document.querySelector(".url").addEventListener('click', (e) => { copyToClipboard(e.target.innerText) });
-        document.querySelector(".redirect li").addEventListener('click', (e) => { copyToClipboard(e.target.innerText) });
+        document.querySelectorAll("td .url").forEach((el)=>el.addEventListener('click', (e) => { copyToClipboard(e.target.innerText); this.notify('Copied url to clipboard!')}));
+        document.querySelectorAll("td.redirect ul li").forEach((el)=>el.addEventListener('click', (e) => { copyToClipboard(e.target.innerText); this.notify('Copied url to clipboard!');}));
+        this.allowRender = false;
+        this.notify('Table has been built...');
     }
     switchDisplay() {
         const btn = document.getElementById('visualize');

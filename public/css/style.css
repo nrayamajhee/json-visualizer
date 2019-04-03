@@ -1,9 +1,8 @@
 :root {
     --bg: #93A1A1;
     --field-color: #EEE8D5;
-    --highlight-color: #002B36;
     --bg-lighter: #FDF6E3;
-    --text: #586E75;
+    --text: #073642;
     --button: #586E75;
     --warning: #DC322F;
     --warning-subtle: #268BD2;
@@ -32,9 +31,6 @@ body {
     color: var(--text);
     font: 16px/1.5 sans-serif;
 }
-h1, p {
-    color: var(--highlight-color);
-}
 h1 {
     font-size: 2em;
     line-height: 1;
@@ -47,7 +43,7 @@ p {
     padding: calc(var(--gap) / 2) calc(2 * var(--gap));
 }
 
-#code {
+#code textarea {
     resize: none;
     background-color: var(--field-color);
     border: 0;

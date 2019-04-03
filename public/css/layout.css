@@ -37,7 +37,7 @@ scroll-wrap {
     overflow: hidden;
 }
 
-scroll {
+.scroll, scroll {
     width: calc(100% + var(--hscroll));
     height: calc(100% + var(--vscroll));
     overflow: scroll;
@@ -120,17 +120,64 @@ td.redirect {
     margin-right: 0;
 }
 
-.redirect li.server-redirect {
-    background-color: #2AA198;
+legend {
+    position: absolute;
+    bottom: 0.7em;
+    padding: calc(var(--gap) / 4);
+    right: 0;
+    z-index: 8;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--bg-lighter);
 }
-.redirect li.window-open {
+legend h3 {
+    margin: 0;
+    float: left;
+}
+legend li {
+    padding: calc(var(--gap) / 4) calc(var(--gap) * 0.4);
+    border-radius: calc(var(--gap) * 0.8);
+    margin-right: calc(var(--gap) / 4);
+    color: var(--bg-lighter);
+}
+legend li:last-child {
+    margin-right: 0;
+}
+legend ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+li.scheduled-action {
+    background-color: #073642;
+}
+li.server-redirect {
+    background-color: #586E75;
+}
+li.first {
+    background-color: #B58900;
+}
+li.history-push-state {
+    background-color: #DC322F;
+}
+li.js-navigation {
+    background-color: #D33682;
+}
+li.window-open {
     background-color: #6C71C4;
 }
-.redirect li.script-load {
-    background-color: #859900;
+li.anchor-link-click {
+    background-color: #268BD2;
 }
-.redirect li.first {
-    background-color: #B58900;
+li.frame-load {
+    background-color: #2AA198;
+}
+li.script-load {
+    background-color: #859900;
 }
 
 td .url {
@@ -142,15 +189,50 @@ td .url {
 
 td .url:after {
     cursor: pointer;
-    content: '...';
+    font-family: 'Material Icons';
+    content: '\e14d';
     position: absolute;
     background-color: var(--warning-subtle);
     line-height: 1;
     color: var(--bg-lighter);
-    padding: 0 calc(var(--gap) / 2);
-    padding-bottom: calc(var(--gap) / 4);
+    padding: calc(var(--gap) / 4) calc(var(--gap) / 2);
     border-radius: var(--gap);
     bottom: 1em;
     left: 50%;
     transform: translateX(-50%);
+}
+
+notify {
+    position: absolute;
+    top: 1em;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 30em;
+    min-height: 3em;
+    background-color: var(--bg-lighter);
+    border-radius: var(--gap);
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    padding: var(--gap);
+    display: none;
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+notify p {
+    padding: 0;
+    margin-bottom: var(--gap);
+}
+
+notify p:last-child {
+    margin-bottom: 0;
+}
+
+notify.shown {
+    display: flex;
+}
+notify.visible {
+    opacity: 1;
 }

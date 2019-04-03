@@ -6,28 +6,35 @@
     <title>Simple JSON Visualizer</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/layout.css">
+    <link rel="icon" href="img/logo_icon.png">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
 <body>
     <wrapper>
-
+        <notify></notify>
         <h1>Simple JSON Visualizer</h1>
         <deck>
-            <textarea autocomplete="off" id="code">
+            <console-in id="code">
+                <scroll-wrap>
+                    <textarea class="scroll" autocomplete="off">
 // Your javascript goes here
 // Note: The code written here is evaluated as is, so technically you could break the app.
 // Use with caution!
 // The functions exposed are: readJsonFile, readJsonUrl, and the Applciation object as 'app'
 // Click the play button on the right to run this code.
 
-readJsonUrl('file:///home/nishan/Documents/Projects/dr-phai-research/data/sample_data_1.txt')
+readJsonUrl('file:///home/nishan/Documents/Projects/json-visualizer/public/data/sample_data_1.txt')
     .then((data) => {
         app.setData(data);
+        app.notify('Reading json file...');
         app.log(JSON.stringify(data, undefined, 2));
-        app.log('Reading json file and displaying it here:');
+        app.notify('Displaying json file...');
+        app.renderTable();
     }).catch((err) => app.log(err));
         </textarea>
+                </scroll-wrap>
+            </console-in>
             <button id="run"><i class="material-icons">play_arrow</i></button>
             <panel>
                 <scroll-wrap>
@@ -43,6 +50,19 @@ readJsonUrl('file:///home/nishan/Documents/Projects/dr-phai-research/data/sample
                             <tab>
                                 <scroll-wrap>
                                     <scroll>
+                                        <legend>
+                                            <ul>
+                                                <li class="scheduled-action">Scheduled Action</li>
+                                                <li class="server-redirect">Server Redirect</li>
+                                                <li class="first">First</li>
+                                                <li class="history-push-state">History Push State</li>
+                                                <li class="js-navigation">JS Navigation</li>
+                                                <li class="window-open">Window Open</li>
+                                                <li class="anchor-link-click">Anchor Link Click</li>
+                                                <li class="frame-load">Frame Load</li>
+                                                <li class="script-load">Script Load</li>
+                                            </ul>
+                                        </legend>
                                         <table>
                                         </table>
                                     </scroll>
@@ -79,25 +99,33 @@ readJsonUrl('file:///home/nishan/Documents/Projects/dr-phai-research/data/sample
         <script src="js/shell.js"></script>
         <script>
             (function main() {
-                const app = new Application('scroll pre', 'table', false);
+                const app = new Application({
+                    console: 'scroll pre',
+                    table: 'table',
+                    notify: { el: 'notify', time: 1000 },
+                    outputToConsole: false,
+                });
                 let data;
                 document.getElementById("run").addEventListener('click', () => {
                     app.slider.scrollLeft = 0;
-                    const code = document.getElementById("code").value;
+                    const code = document.querySelector("#code textarea").value;
                     eval(code);
                 })
                 document.getElementById("visualize").addEventListener('click', (e) => {
                     app.switchDisplay();
-                    app.renderTable();
+                    const scroll = this.slider.scrollLeft;
                 });
                 document.getElementById("file").addEventListener('change', (e) => {
+                    app.allowRender = true;
+                    app.notify('Loading file')
                     app.slider.scrollLeft = 0;
                     readJsonFile(e.target.files)
                         .then((d) => {
                             app.clear();
                             app.setData(d);
                             app.log(JSON.stringify(d, undefined, 2));
-                            app.log(`Loaded file!`)
+                            app.notify('Loaded file!')
+                            app.renderTable();
                         }).catch((err) => app.log(err));
                 })
                 document.getElementById("text-wrap").addEventListener('click', (e) => {
